@@ -1,0 +1,94 @@
+Privacy Statement for Scroll4Me
+
+Effective date: 27-10-2025
+
+Who we are
+
+Scroll4Me is an experimental, non-commercial Chrome extension created by Ilse Pouwels. It automates a short scroll of your public feeds to surface relevant posts and reduce time spent doomscrolling.
+
+What data we access
+
+Public content only:
+
+LinkedIn and Instagram posts that are publicly accessible.
+
+No access to private posts, DMs, or content behind logins or paywalls.
+
+Local app settings:
+
+Your Focus Profile (selected platforms, interests, and rules).
+
+Your OpenAI API key, if you choose to provide one.
+
+What data we send to OpenAI (for filtering)
+
+When filtering is enabled, the extension sends only minimal and trimmed post data to the OpenAI API:
+
+Platform name (e.g. “LinkedIn”, “Instagram”)
+
+Author display name (if publicly visible)
+
+Post text (up to ~600 characters)
+
+Boolean for whether the post contains an image (no image URLs)
+
+Original post URL (for deduplication)
+
+Your locally stored Focus Profile context (interests/tags)
+
+Your OpenAI API key is used only to authenticate requests to OpenAI and is never shared elsewhere.
+
+Where data is stored
+
+Local only: All data (Focus Profile, API key) is stored in your browser’s local storage.
+
+No servers: Scroll4Me operates no external server or cloud database.
+
+Third-party processing: OpenAI processes limited post data for filtering. Please refer to OpenAI’s privacy terms for details on temporary data retention.
+
+What we do not do
+
+No collection or sale of personal data
+
+No analytics, tracking, or advertising
+
+No access to private messages or hidden data
+
+No long-term storage beyond your own browser
+
+Permissions used
+
+tabs, scripting, activeTab: automate short scrolling and capture public posts on the user’s open tab
+
+storage: save Focus Profile and API key locally
+
+host permissions: linkedin.com, instagram.com (and related CDNs) to access public feeds; api.openai.com to call the OpenAI API
+
+Security
+
+Your OpenAI API key is stored only on your device.
+
+All communication with OpenAI uses HTTPS.
+
+You can revoke your API key or clear the extension’s local storage at any time.
+
+Your choices
+
+Use without an API key: Only limited trial scrolls are available.
+
+Remove data: Clear local storage or uninstall the extension to delete all data.
+
+Children
+
+Scroll4Me is not intended for use by minors under the age of digital consent applicable in their region.
+
+Changes
+
+Any updates to this statement will be reflected in the “Effective date” above.
+
+Contact
+
+For privacy or data questions:
+📧 ilsepouwels.design@gmail.com
+
+🌐 ilsepouwels.nl/scroll4me
