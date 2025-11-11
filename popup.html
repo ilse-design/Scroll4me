@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Scroll4Me</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* New Design System */
+      body {
+        font-family: 'IBM Plex Sans', sans-serif;
+        background: url('background.png') center/cover no-repeat;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .screen {
+        display: none;
+        width: 100%;
+        max-width: 800px;
+        padding: 48px;
+        text-align: center;
+        transition: all 0.3s ease;
+        flex-direction: column;
+        gap: 24px;
+        min-height: 80vh;
+        justify-content: center;
+      }
+
+      .screen.active {
+        display: flex;
+      }
+
+      /* Typography */
+      .title {
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-weight: 600;
+        font-size: 36px;
+        color: black;
+        margin-bottom: 16px;
+      }
+
+      .text {
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-weight: 400;
+        font-size: 18px;
+        color: black;
+        line-height: 1.5;
+        margin-bottom: 24px;
+      }
+
+      .text.left-align {
+        text-align: left;
+        max-width: 600px;
+        margin: 0 auto 24px;
+      }
+
+      /* Glass Effect Buttons */
+      .glass-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 12px 50px;
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-size: 18px;
+        color: black;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        margin: 0 auto;
+        display: inline-block;
+      }
+
+      .glass-btn:hover {
+        background: black;
+        color: white;
+      }
+
+      .glass-btn.selected {
+        background: black;
+        color: white;
+      }
+
+      /* Step Indicator */
+      .step-indicator {
+        font-size: 16px;
+        color: #888;
+        font-weight: 400;
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      /* Pop-up Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 32px;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        backdrop-filter: blur(10px);
+      }
+
+      .modal-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: black;
+      }
+
+      .modal-text {
+        font-size: 16px;
+        line-height: 1.5;
+        color: black;
+        text-align: left;
+        white-space: pre-line;
+      }
+
+      .close-modal {
+        margin-top: 20px;
+      }
+
+      /* Platform Selection */
+      .platform-selection {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        margin: 24px 0;
+      }
+
+      .checkbox-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .checkbox-option input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        accent-color: black;
+      }
+
+      .checkbox-option label {
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      /* Time Dropdown */
+      .time-selector {
+        margin: 24px 0;
+      }
+
+      .time-dropdown {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 12px 25px 12px 16px;
+        font-size: 18px;
+        color: black;
+        backdrop-filter: blur(10px);
+        min-width: 200px;
+        font-weight: 400;
+        margin-top: 24px;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 8px center;
+        background-repeat: no-repeat;
+        background-size: 16px 16px;
+      }
+
+      /* Tag Selector */
+      .tag-section {
+        margin: 24px 0 0 0;
+        text-align: left;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .tag-section-title {
+        font-weight: 600;
+        font-size: 18px;
+        margin-bottom: 12px;
+        color: black;
+      }
+
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .tag {
+        background: transparent;
+        border: 1px solid black;
+        border-radius: 2px;
+        padding: 6px 12px;
+        font-size: 16px;
+        color: black;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .tag:hover, .tag.selected {
+        background: black;
+        color: white;
+      }
+
+      .tag.add-tag {
+        font-size: 20px;
+        padding: 6px 10px;
+      }
+
+      /* Weekly Selector */
+      .weekly-section {
+        margin: 8px 0 24px 0;
+        text-align: left;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+      }
+
+      .weekly-rule {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .weekly-dropdown {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 16px;
+        color: black;
+        backdrop-filter: blur(10px);
+        min-width: 120px;
+      }
+
+      .weekly-input {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 16px;
+        color: black;
+        backdrop-filter: blur(10px);
+        flex: 1;
+      }
+
+      .weekly-input.placeholder {
+        opacity: 0.3;
+      }
+
+      .add-weekly {
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: black;
+      }
+
+      /* Navigation Buttons */
+      .nav-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        margin-top: 32px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Summary Box */
+      .summary-box {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 24px;
+        margin: 24px auto;
+        max-width: 600px;
+        text-align: left;
+        backdrop-filter: blur(10px);
+      }
+
+      .summary-section {
+        margin-bottom: 16px;
+      }
+
+      .summary-label {
+        font-weight: 600;
+        font-size: 18px;
+        margin-bottom: 12px;
+        color: black;
+      }
+
+      .summary-content {
+        color: black;
+        line-height: 1.4;
+        font-size: 18px;
+      }
+
+      /* Time Savings Display */
+      .time-savings {
+        margin: 24px auto;
+        max-width: 500px;
+        text-align: left;
+      }
+
+      .savings-item {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 8px 0;
+        color: black;
+      }
+
+      .highlight-text {
+        font-size: 24px;
+        margin: 0 0 0 0;
+      }
+
+      /* Legacy styles for existing daily flow */
+      .screen.legacy {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      }
+
+      .screen.legacy .title {
+        font-family: 'Inter', sans-serif;
+        color: #2c3e2c;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .screen.legacy .subtitle {
+        font-family: 'Inter', sans-serif;
+        color: #4a5f4a;
+        font-size: 16px;
+        margin-bottom: 24px;
+      }
+
+      .input-group {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .input-group label {
+        font-size: 14px;
+        color: #2c3e2c;
+        font-weight: 500;
+        text-align: left;
+      }
+
+      .notion-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #c2e0c2;
+        border-radius: 8px;
+        font-size: 16px;
+      }
+
+      #scroll-duration-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
+
+      #scroll-duration-container label {
+        font-size: 14px;
+        color: #4a5f4a;
+        font-weight: 500;
+      }
+
+      #scroll-duration-input {
+        width: 80px;
+        padding: 8px;
+        border: 1px solid #c2e0c2;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+
+      .notion-btn {
+        background: #2ecc71;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 50px;
+        font-size: 16px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: background 0.2s;
+        margin: 0 auto;
+      }
+
+      .notion-btn:hover {
+        background: #27ae60;
+      }
+
+      /* Loading and Results screens keep existing styles */
+      #loading-screen {
+        text-align: center;
+        gap: 24px;
+      }
+
+      #loading-screen .loader {
+        border: 4px solid #c2e0c2;
+        border-top: 4px solid #2ecc71;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      #results-screen {
+        max-width: 70%;
+      }
+
+      #results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      .card {
+        background: #f0f7f0;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border: 1px solid #c2e0c2;
+      }
+
+      .card-content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        gap: 8px;
+      }
+
+      .card-text {
+        font-size: 14px;
+        color: #2c3e2c;
+        line-height: 1.5;
+      }
+
+      .card-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #c2e0c2;
+        background-color: #f8f9fa;
+        transition: opacity 0.3s ease;
+      }
+
+      .card-image.loading {
+        opacity: 0.7;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+      }
+
+      @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      .platform-badge.instagram {
+        background-color: #ffeaa7 !important;
+        color: #d63031 !important;
+      }
+
+      .results-footer-text {
+        text-align: center;
+        color: #2c3e2c;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .open-post-btn {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-top: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s;
+      }
+
+      .open-post-btn:hover {
+        background-color: #27ae60;
+      }
+
+      .open-post-link {
+        background-color: transparent;
+        border: none;
+        color: #4a5f4a;
+        cursor: pointer;
+        font-size: 12px;
+        text-decoration: none;
+        margin-top: auto;
+        align-self: flex-end;
+        padding: 4px;
+        transition: color 0.2s;
+      }
+
+      .open-post-link:hover {
+        color: #27ae60;
+        text-decoration: underline;
+      }
+
+      /* Filter Animation Styles */
+      #filter-animation-screen {
+        background: url('background.png') center/cover no-repeat;
+        overflow: hidden;
+        position: relative;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        max-width: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .filter-animation-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(32, 30px);
+        grid-template-rows: repeat(8, 40px);
+        gap: 4px;
+        position: relative;
+        margin-top: 20px;
+      }
+
+      .grid-box {
+        width: 30px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: scale(0);
+      }
+
+      .grid-box.appear {
+        opacity: 0.8;
+        transform: scale(1);
+      }
+
+      .grid-box.highlighted {
+        opacity: 1 !important;
+        background: rgba(255, 255, 255, 1) !important;
+        /* transform: scale(1.1) !important; -- Removed to allow JS scaling */
+        transition: all 0.5s ease !important;
+        animation: none !important;
+      }
+
+      .status-text {
+        position: relative;
+        margin-bottom: 20px;
+        color: black;
+        font-size: 24px;
+        font-weight: 600;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        z-index: 100;
+      }
+
+      .status-text.show {
+        opacity: 1;
+      }
+
+      .final-cards-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 1;
+        pointer-events: auto;
+        width: 350px;
+        height: 550px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+      }
+
+      .card-deck {
+        position: relative;
+        width: 100%;
+        height: 450px;
+        flex-shrink: 0;
+      }
+
+      .final-card {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transform: scale(0);
+        opacity: 0;
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+
+      .final-card.stacked {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+
+      /* Depth effect for stacked cards; z-index set dynamically in JS */
+      .final-card.stacked:nth-child(1) { transform: scale(1) rotate(0deg) translate(0px, 0px); }
+      .final-card.stacked:nth-child(2) { transform: scale(1) rotate(0deg) translate(4px, 4px); }
+      .final-card.stacked:nth-child(3) { transform: scale(1) rotate(0deg) translate(8px, 8px); }
+      .final-card.stacked:nth-child(4) { transform: scale(1) rotate(0deg) translate(12px, 12px); }
+      .final-card.stacked:nth-child(5) { transform: scale(1) rotate(0deg) translate(16px, 16px); }
+      .final-card.stacked:nth-child(n+6) { transform: scale(1) rotate(0deg) translate(20px, 20px); }
+
+      .next-button {
+        background: rgba(255, 255, 255, 0.2);
+        color: black;
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 12px 50px;
+        font-size: 18px;
+        font-family: 'IBM Plex Sans', sans-serif;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      .next-button.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .next-button:hover {
+        background: black;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .next-button:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .card-step-indicator {
+        font-size: 16px;
+        color: #888;
+        font-family: 'IBM Plex Sans', sans-serif;
+      }
+
+      .completion-message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 32px;
+        font-weight: bold;
+        text-align: center;
+        opacity: 0;
+        transition: all 0.8s ease;
+      }
+
+      .completion-message.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+      }
+
+      /* Slide away animation - changed to go left */
+      @keyframes slideAway {
+        0% {
+          transform: scale(1) rotate(0deg);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.05) rotate(-5deg) translateX(-100px);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(0.8) rotate(-15deg) translateX(-400px);
+          opacity: 0;
+        }
+      }
+
+      .slide-away {
+        animation: slideAway 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        z-index: 100 !important;
+      }
+
+      /* Animation Keyframes */
+      @keyframes gridAppear {
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes fadeToLow {
+        to {
+          opacity: 0.2;
+        }
+      }
+
+      @keyframes highlightBox {
+        to {
+          opacity: 1;
+          background: rgba(255, 255, 255, 1);
+          transform: scale(1.1);
+        }
+      }
+
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+      }
+
+      @keyframes moveToCenter {
+        0% {
+          transform: scale(1.1);
+          background: rgba(255, 255, 255, 0.8);
+        }
+        50% {
+          transform: translate(calc(var(--target-x) * 0.5), calc(var(--target-y) * 0.5)) scale(1.3);
+          background: rgba(255, 255, 255, 0.9);
+        }
+        100% {
+          transform: translate(var(--target-x), var(--target-y)) scale(2);
+          background: rgba(255, 255, 255, 1);
+          opacity: 0.9;
+        }
+      }
+
+      @keyframes expandCard {
+        from {
+          transform: scale(0);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* Animation Classes */
+      .fade-low {
+        animation: fadeToLow 0.5s ease-out forwards;
+      }
+
+      .highlight {
+        animation: highlightBox 0.3s ease-out forwards;
+      }
+
+      .fade-out {
+        animation: fadeOut 0.5s ease-out forwards;
+      }
+
+      .grid-box.move-to-center {
+        animation: moveToCenter 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        z-index: 1000;
+        transition: none !important;
+        position: absolute;
+      }
+
+      .expand-card {
+        animation: expandCard 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+
+      /* Header Menu Styles */
+      .header-menu {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 40px;
+        z-index: 100;
+      }
+
+      .menu-center {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
+      }
+
+      .menu-btn {
+        background: transparent;
+        border: none;
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-size: 18px;
+        color: black;
+        cursor: pointer;
+        padding: 8px 0px;
+        position: relative;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+
+      .menu-btn::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: black;
+        transition: all 0.3s ease;
+      }
+
+      .menu-btn:hover {
+        background: black;
+        color: white;
+        border-radius: 10px;
+        padding: 8px 12px;
+      }
+      
+      .menu-btn:hover::after {
+        display: none;
+      }
+
+      /* Activity List Styles */
+      .activity-list {
+        margin: 0 auto;
+        max-width: 400px;
+        text-align: left;
+        list-style: none;
+        padding: 0;
+      }
+      
+      .activity-list div {
+        margin-bottom: 8px;
+        font-size: 16px;
+        line-height: 1.4;
+      }
+
+      .activity-item {
+        font-size: 18px;
+        color: black;
+        margin: 12px 0;
+        padding-left: 0;
+        position: relative;
+      }
+
+      /* Progress Bar Styles */
+      .progress-container {
+        margin: 40px auto;
+        max-width: 400px;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid black;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: black;
+        width: 0%;
+        transition: width 0.5s ease;
+      }
+
+      .progress-status {
+        text-align: center;
+        margin-top: 12px;
+        font-size: 16px;
+        color: black;
+        font-weight: 400;
+      }
+
+      .time-remaining {
+        text-align: center;
+        margin-top: 4px;
+        font-size: 14px;
+        color: #888;
+        font-weight: 400;
+      }
+
+      /* Time Saved Container */
+      .time-saved-container {
+        margin: 32px auto;
+        max-width: 500px;
+      }
+
+      .time-saved-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 16px 0;
+        padding: 0;
+      }
+
+      .time-saved-label {
+        font-size: 18px;
+        color: black;
+      }
+
+      .time-saved-value {
+        font-size: 20px;
+        font-weight: 600;
+        color: black;
+      }
+
+      /* Impact Report Styles */
+      .impact-report {
+        margin: 32px 0;
+        max-width: 500px;
+      }
+
+      .impact-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: black;
+        text-align: left;
+        margin-bottom: 24px;
+      }
+
+      .impact-stats {
+        text-align: left;
+      }
+
+      .impact-stat {
+        line-height: 1.4;
+      }
+
+      .impact-stat:last-child {
+        margin-bottom: 0;
+      }
+
+      .impact-text {
+        font-size: 18px;
+        color: black;
+        font-weight: 500;
+      }
+
+      /* Focus Profile Section */
+      .focus-profile-section {
+        margin: 32px 0;
+        max-width: 500px;
+      }
+
+      .focus-profile-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: black;
+        text-align: left;
+        margin-bottom: 24px;
+      }
+
+      .focus-profile-overview {
+        text-align: left;
+        margin-bottom: 24px;
+      }
+
+      .focus-overview-item {
+        line-height: 1.4;
+        margin-bottom: 12px;
+      }
+
+      .focus-overview-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .focus-overview-text {
+        font-size: 18px;
+        color: black;
+        font-weight: 500;
+      }
+
+      .focus-overview-label {
+        font-weight: 600;
+      }
+
+      .change-focus-btn {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        color: black;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        align-self: flex-start;
+      }
+
+      .change-focus-btn:hover {
+        background: black;
+        color: white;
+      }
+
+      /* API Key Section */
+      .api-key-section {
+        margin: 32px 0;
+        max-width: 500px;
+      }
+
+      .api-key-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: black;
+        text-align: left;
+        margin-bottom: 24px;
+      }
+
+      .api-key-input {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.5);
+        color: black;
+        margin-bottom: 16px;
+        box-sizing: border-box;
+      }
+
+      .api-key-input:focus {
+        outline: none;
+        border-color: black;
+        background: rgba(255, 255, 255, 0.7);
+      }
+
+      .api-key-link {
+        color: #666;
+        text-decoration: underline;
+        font-size: 14px;
+        cursor: pointer;
+        font-style: italic;
+        text-align: left;
+        display: block;
+      }
+
+      .api-key-link:hover {
+        color: black;
+      }
+
+    </style>
+  </head>
+  <body>
+    <!-- Onboarding Screen 1: Welcome -->
+    <div id="onboarding-welcome" class="screen active">
+      <div class="title">Welcome to Scroll4Me</div>
+      <div class="text">
+        An experimental, non-profit project built for people, not for profit. <br>
+        It uses AI to cut through the endless stream of mediocre content, <br>
+        helping you take back control of your time. 
+        <br><br>
+        Designed to serve you, not Big Tech.
+      </div>
+      <button class="glass-btn" id="welcome-continue-btn">Get Started</button>
+    </div>
+
+    <!-- Onboarding Screen 2: Your attention, Your rules -->
+    <div id="onboarding-rules" class="screen">
+      <div class="title">Your attention, Your rules</div>
+      <div class="text left-align">
+        Scroll4Me uses AI to sift through the flood of content and surface what actually matters based on the focus you set (you'll set those up next). <br>
+        You'll get a few free scrolls to try it out before entering anything.
+        <br><br>
+        Want to see exactly what's sent to ChatGPT? <br>
+        <span style="font-style: italic; color: #888; text-decoration: underline; cursor: pointer;" id="view-prompt-link">View the prompt it uses</span>
+      </div>
+      <button class="glass-btn" id="rules-continue-btn">Continue</button>
+      </div>
+
+    <!-- Onboarding Screen 3: Privacy & Permissions -->
+    <div id="onboarding-privacy" class="screen">
+      <div class="title">Privacy, for real</div>
+      <div class="text left-align">
+        Scroll4Me only looks at <strong>publicly available</strong> content. It never accesses private information or anything behind logins.
+        <br><br>
+        Your focus profile is <strong>stored locally</strong> in your browser. It's used to anonymously guide the AI (ChatGPT) in sorting through posts. Each result is processed in real-time and disappears as soon as you see it, nothing is saved, nothing is shared.
+        <br><br>
+        This is not just about privacy. It's <strong>a design choice</strong>. When you're done scrolling, it's truly over. No leftovers, no digital mess.
+      </div>
+      <button class="glass-btn" id="privacy-continue-btn">Continue</button>
+      </div>
+
+    <!-- Onboarding Screen 4: Current scrolling time -->
+    <div id="onboarding-time" class="screen">
+      <div class="title">How much do you scroll each day?</div>
+      <div class="text" style="margin-bottom: 0;">
+        Open your phone settings and look up your daily screen time for Instagram or LinkedIn.
+        Enter it here, lets see how much time you could reclaim.
+      </div>
+      <div class="time-selector">
+        <select class="time-dropdown" id="daily-scroll-time">
+          <option value="15">15 minutes</option>
+          <option value="30">30 minutes</option>
+          <option value="45">45 minutes</option>
+          <option value="60">1 hour</option>
+          <option value="75">1 hour 15 minutes</option>
+          <option value="90">1 hour 30 minutes</option>
+          <option value="105">1 hour 45 minutes</option>
+          <option value="120">2 hours</option>
+          <option value="135">2 hours 15 minutes</option>
+          <option value="150">2 hours 30 minutes</option>
+          <option value="165">2 hours 45 minutes</option>
+          <option value="180">3 hours</option>
+          <option value="195">3 hours 15 minutes</option>
+          <option value="210">3 hours 30 minutes</option>
+          <option value="225">3 hours 45 minutes</option>
+          <option value="240">4 hours</option>
+        </select>
+      </div>
+      <button class="glass-btn" id="time-continue-btn">Continue</button>
+      </div>
+
+    <!-- Onboarding Screen 5: Reclaim your time -->
+    <div id="onboarding-savings" class="screen">
+      <div class="title">Reclaim your time</div>
+      <div class="text">Using this app you only spend 5 minutes a day, so you would save:</div>
+      <div class="time-savings">
+        <div class="savings-item" id="daily-savings">-- per day</div>
+        <div class="savings-item" id="weekly-savings">-- per week</div>
+        <div class="savings-item" id="monthly-savings">-- per month</div>
+        <div class="savings-item" id="yearly-savings">-- per year</div>
+        </div>
+      <div class="text highlight-text">🤯 That is huge!</div>
+      <div class="text" style="margin-top: 0;">That's a novel. A trip with friends. A lot of sleep.</div>
+      <div class="text">
+        As little extra it does not only save your time, <br> also Co2 🌱 because you are over consuming less. <br>
+        <span style="font-style: italic; color: #888; text-decoration: underline; cursor: pointer;" id="co2-link">See here how</span>
+      </div>
+      <button class="glass-btn" id="savings-continue-btn">Let's start</button>
+      </div>
+
+    <!-- Onboarding Screen 6: Platform Selection -->
+    <div id="onboarding-platform" class="screen">
+      <div class="title">What should be scrolled?</div>
+      <div class="platform-selection">
+        <div class="checkbox-option">
+          <input type="checkbox" id="linkedin-checkbox" name="platform" value="linkedin">
+          <label for="linkedin-checkbox">LinkedIn</label>
+        </div>
+        <div class="checkbox-option">
+          <input type="checkbox" id="instagram-checkbox" name="platform" value="instagram">
+          <label for="instagram-checkbox">Instagram</label>
+        </div>
+      </div>
+      <div class="text left-align">
+        To make Scroll4Me work, make sure you're already logged into these platforms in your usual browser (the one you're using now). It doesn't ask for your passwords, the extension simply opens your feed in a new tab and starts scrolling there.
+      </div>
+      <button class="glass-btn" id="platform-continue-btn">Continue</button>
+      <div class="step-indicator">step 1/4</div>
+    </div>
+
+    <!-- Onboarding Screen 7: LinkedIn Setup -->
+    <div id="onboarding-linkedin" class="screen">
+      <div class="title">LinkedIn</div>
+      <div class="text">
+        What are you interested in on this platform to be up to date about.<br>
+        You change these preferences at any given moment.
+      </div>
+      
+      <div class="tag-section">
+        <div class="tag-section-title">Daily</div>
+        <div class="tag-list" id="linkedin-tags">
+          <div class="tag" data-tag="🧠 Insights">🧠 Insights</div>
+          <div class="tag" data-tag="💼 Jobs">💼 Jobs</div>
+          <div class="tag" data-tag="💬 Opinions">💬 Opinions</div>
+          <div class="tag" data-tag="📊 Trends">📊 Trends</div>
+          <div class="tag" data-tag="🎯 Wins">🎯 Wins</div>
+          <div class="tag" data-tag="🚀 Launches">🚀 Launches</div>
+          <div class="tag" data-tag="💡 Ideas">💡 Ideas</div>
+          <div class="tag" data-tag="🎓 Learn">🎓 Learn</div>
+          <div class="tag" data-tag="📣 Talks">📣 Talks</div>
+          <div class="tag" data-tag="🌱 Growth">🌱 Growth</div>
+          <div class="tag add-tag" id="linkedin-add-tag">+</div>
+        </div>
+      </div>
+
+      <div class="weekly-section">
+        <div class="tag-section-title">Weekly</div>
+        <div id="linkedin-weekly-rules">
+          <div class="weekly-rule">
+            <select class="weekly-dropdown">
+              <option value="">Select day</option>
+              <option value="monday">Monday</option>
+              <option value="tuesday">Tuesday</option>
+              <option value="wednesday">Wednesday</option>
+              <option value="thursday">Thursday</option>
+              <option value="friday">Friday</option>
+              <option value="saturday">Saturday</option>
+              <option value="sunday">Sunday</option>
+            </select>
+            <input type="text" class="weekly-input" placeholder="What you want to see on this day...">
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+          <button class="add-weekly" id="linkedin-add-weekly">+</button>
+          <input type="text" class="weekly-input placeholder" placeholder="Add another weekly rule..." readonly>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="glass-btn" id="linkedin-previous-btn">Previous</button>
+        <button class="glass-btn" id="linkedin-continue-btn">Continue</button>
+      </div>
+      <div class="step-indicator">step 2/4</div>
+    </div>
+
+    <!-- Onboarding Screen 8: Instagram Setup -->
+    <div id="onboarding-instagram" class="screen">
+      <div class="title">Instagram</div>
+      <div class="text">
+        What are you interested in on this platform to be up to date about.<br>
+        You change these preferences at any given moment.
+      </div>
+      
+      <div class="tag-section">
+        <div class="tag-section-title">Daily</div>
+        <div class="tag-list" id="instagram-tags">
+          <div class="tag" data-tag="👯 Friends">👯 Friends</div>
+          <div class="tag" data-tag="🍝 Food">🍝 Food</div>
+          <div class="tag" data-tag="🌍 Travel">🌍 Travel</div>
+          <div class="tag" data-tag="🎉 Moments">🎉 Moments</div>
+          <div class="tag" data-tag="😂 Memes">😂 Memes</div>
+          <div class="tag" data-tag="💡 Ideas">💡 Ideas</div>
+          <div class="tag" data-tag="⚽ Sports">⚽ Sports</div>
+          <div class="tag" data-tag="🎓 Learn">🎓 Learn</div>
+          <div class="tag" data-tag="💅 Style">💅 Style</div>
+          <div class="tag" data-tag="✨ Events">✨ Events</div>
+          <div class="tag add-tag" id="instagram-add-tag">+</div>
+        </div>
+      </div>
+
+      <div class="weekly-section">
+        <div class="tag-section-title">Weekly</div>
+        <div id="instagram-weekly-rules">
+          <div class="weekly-rule">
+            <select class="weekly-dropdown">
+              <option value="">Select day</option>
+              <option value="monday">Monday</option>
+              <option value="tuesday">Tuesday</option>
+              <option value="wednesday">Wednesday</option>
+              <option value="thursday">Thursday</option>
+              <option value="friday">Friday</option>
+              <option value="saturday">Saturday</option>
+              <option value="sunday">Sunday</option>
+            </select>
+            <input type="text" class="weekly-input" placeholder="What you want to see on this day...">
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+          <button class="add-weekly" id="instagram-add-weekly">+</button>
+          <input type="text" class="weekly-input placeholder" placeholder="Add another weekly rule..." readonly>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="glass-btn" id="instagram-previous-btn">Previous</button>
+        <button class="glass-btn" id="instagram-continue-btn">Continue</button>
+      </div>
+      <div class="step-indicator">step 3/4</div>
+    </div>
+
+    <!-- Onboarding Screen 9: Summary -->
+    <div id="onboarding-summary" class="screen">
+      <div class="title">Focus profile</div>
+      <div class="text">This is your focus profile, you can change this at any time.</div>
+      
+      <div class="summary-box">
+        <div class="summary-section">
+          <div class="summary-label">Daily</div>
+          <div class="summary-content" id="summary-daily-tags">No tags selected</div>
+        </div>
+        <div class="summary-section">
+          <div class="summary-label">Weekly</div>
+          <div class="summary-content" id="summary-weekly-rules">No weekly rules set</div>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button class="glass-btn" id="summary-previous-btn">Previous</button>
+        <button class="glass-btn" id="summary-finish-btn">Finish</button>
+      </div>
+      <div class="step-indicator">step 4/4</div>
+    </div>
+
+    <!-- Daily Screen 1: Start Scrolling -->
+    <div id="daily-start" class="screen">
+      <div class="header-menu">
+        <div class="menu-left">
+          <button class="menu-btn" id="about-btn">About</button>
+        </div>
+        <div class="menu-right">
+          <button class="menu-btn" id="profile-btn">Profile</button>
+        </div>
+      </div>
+      
+      <div class="title">Let's not waste time scrolling today.</div>
+      <button class="glass-btn" id="start-scroll-btn">Scroll for me</button>
+      <div id="free-trial-counter" class="text"></div>
+      
+    </div>
+
+    <!-- Daily Screen 2: Waiting Screen -->
+    <div id="daily-waiting" class="screen">
+      <div class="header-menu">
+        <div class="menu-left">
+          <button class="menu-btn" id="about-btn-2">About</button>
+        </div>
+        <div class="menu-right">
+          <button class="menu-btn" id="profile-btn-2">Profile</button>
+        </div>
+      </div>
+      
+      <div class="title">Scrolling for you..</div>
+      <div class="text">This will take sometime, but you can do other things in the meantime</div>
+      
+      <div class="activity-list" id="activity-list">
+        <!-- Activities will be populated dynamically by JavaScript -->
+      </div>
+      
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-status" id="progress-status">Scrolling through your feeds...</div>
+        <div class="time-remaining" id="time-remaining">2 minutes left</div>
+      </div>
+    </div>
+
+    <!-- Daily Screen 3: Transition Animation (reuse existing filter animation) -->
+    <!-- This will use the existing filter-animation-screen -->
+
+    <!-- Daily Screen 4: Stack of Cards -->
+    <div id="daily-cards" class="screen">
+      <div class="header-menu">
+        <div class="menu-left">
+          <button class="menu-btn" id="about-btn-3">About</button>
+        </div>
+        <div class="menu-right">
+          <button class="menu-btn" id="profile-btn-3">Profile</button>
+        </div>
+      </div>
+      
+      <div id="daily-cards-container" class="final-cards-container">
+        <!-- Cards will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Daily Screen 5: Enjoy Your Day -->
+    <div id="daily-complete" class="screen">
+      <div class="header-menu">
+        <div class="menu-left">
+          <button class="menu-btn" id="about-btn-4">About</button>
+        </div>
+        <div class="menu-right">
+          <button class="menu-btn" id="profile-btn-4">Profile</button>
+        </div>
+      </div>
+      
+      <div class="title">Enjoy your bullshit free day 🎉</div>
+      
+      <div class="time-saved-container">
+        <div class="time-saved-item">
+          <div class="time-saved-label">Time saved today:</div>
+          <div class="time-saved-value" id="daily-time-saved">35 minutes</div>
+        </div>
+        <div class="time-saved-item">
+          <div class="time-saved-label">Time saved overall:</div>
+          <div class="time-saved-value" id="total-time-saved">2.5 hours</div>
+        </div>
+      </div>
+      
+      <button class="glass-btn" id="enjoy-day-btn">Enjoy my day</button>
+    </div>
+
+    <!-- About Screen -->
+    <div id="about-screen" class="screen">
+      <div class="header-menu">
+        <div class="menu-left">
+          <button class="menu-btn" id="about-btn-about">About</button>
+        </div>
+        <div class="menu-right">
+          <button class="menu-btn" id="profile-btn-about">Profile</button>
+        </div>
+      </div>
+      
+      <div class="title">About Scroll4Me</div>
+      <div class="text left-align">
+        Scroll4Me is an experiment disguised as a protest tool. Instead of making you scroll endlessly, it scrolls for you. Turning a mindless habit into a playful critique.
+        <br><br>
+        By using AI to filter, slow down, or twist content streams, Scroll4Me shows that digital timelines don’t have to be addictive by design. It highlights how much of our time is lost to irrelevant posts and how this constant stream of distraction feeds digital brainrot. At the same time, it opens up space to imagine alternatives: timelines that serve us, rather than the other way around.
+        <br><br>
+        Scroll4Me is not a product, but a statement. It’s a way to make the invisible mechanics of social media visible and to spark reflection and conversation about healthier, more autonomous ways of being online.
+        <br><br>
+        Scroll4Me is a project by Ilse Pouwels and funded by SIDN Fonds.
+        <br>
+        <a href="https://ilsepouwels.nl/scroll4me" target="_blank" rel="noopener noreferrer">ilsepouwels.nl/scroll4me</a>
+        <br>
+        <a href="https://www.sidnfonds.nl/" target="_blank" rel="noopener noreferrer">sidnfonds.nl</a>
+      </div>
+      
+      <button class="glass-btn" id="back-from-about">Back</button>
+    </div>
+
+    <!-- Profile Screen -->
+    <div id="profile-screen" class="screen">
+      <div class="header-menu">
+        <div class="menu-left">
+          <button class="menu-btn" id="about-btn-profile">About</button>
+        </div>
+        <div class="menu-right">
+          <button class="menu-btn" id="profile-btn-profile">Profile</button>
+        </div>
+      </div>
+      
+      <div class="title">Your Profile</div>
+      
+      <!-- Impact Report -->
+      <div class="impact-report">
+        <div class="impact-title">Impact Report</div>
+        <div class="impact-stats">
+          <div class="impact-stat">
+            <div class="impact-text">Total time saved: <span id="profile-total-saved">2.5 hours</span></div>
+          </div>
+          <div class="impact-stat">
+            <div class="impact-text">Sessions completed: <span id="profile-sessions">12</span></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Focus Profile Section -->
+      <div class="focus-profile-section" style="display: flex; flex-direction: column;">
+        <div class="focus-profile-title">Focus Profile</div>
+        <div class="focus-profile-overview">
+          <div class="focus-overview-item">
+            <div class="focus-overview-text"><span class="focus-overview-label">LinkedIn:</span> <span id="profile-linkedin-info">Not using this platform</span></div>
+          </div>
+          <div class="focus-overview-item">
+            <div class="focus-overview-text"><span class="focus-overview-label">Instagram:</span> <span id="profile-instagram-info">Not using this platform</span></div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button class="change-focus-btn" id="change-focus-profile">Change Focus</button>
+          <button class="change-focus-btn" id="redo-onboarding-btn">Redo Onboarding</button>
+        </div>
+      </div>
+      
+      <!-- API Key Section -->
+      <div class="api-key-section">
+        <div class="api-key-title">API Key</div>
+        <div style="display:flex; gap: 8px; align-items: center;">
+          <input 
+            type="password" 
+            class="api-key-input" 
+            id="api-key-input" 
+            placeholder="Enter your OpenAI API key..."
+            style="flex:1;"
+          >
+          <button class="change-focus-btn" id="api-key-save-btn" style="flex:0 0 auto;">Save</button>
+        </div>
+        <div class="api-key-link" id="api-key-tutorial">How to create an API key (video tutorial)</div>
+      </div>
+      
+      <button class="glass-btn" id="back-from-profile">Back</button>
+    </div>
+
+    <div id="loading-screen" class="screen legacy">
+      <div class="title">Scrolling and Analyzing</div>
+      <div class="loader"></div>
+      <div class="subtitle" id="loading-subtitle">Gathering insights for you...</div>
+      <div class="progress-info" id="progress-info" style="display: none; margin-top: 20px; font-size: 14px; color: #4a5f4a;"></div>
+    </div>
+
+    <div id="results-screen" class="screen legacy">
+      <h1 class="title">Here is the interesting stuff for you today.</h1>
+      <div id="results-grid"></div>
+      <h2 class="results-footer-text">Enjoy your bullshit free day!</h2>
+    </div>
+
+    <!-- New Filter Animation Screen -->
+    <div id="filter-animation-screen" class="screen">
+      <div class="header-menu">
+        <div class="menu-left">
+          <button class="menu-btn" id="about-btn-animation">About</button>
+        </div>
+        <div class="menu-right">
+          <button class="menu-btn" id="profile-btn-animation">Profile</button>
+        </div>
+      </div>
+      
+      <div class="filter-animation-container">
+        <div id="status-text" class="status-text"></div>
+        <div id="filter-grid" class="filter-grid"></div>
+        <div id="final-cards-container" class="final-cards-container"></div>
+      </div>
+    </div>
+
+    <!-- Modal Overlays -->
+    <div id="prompt-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-title">ChatGPT Prompt</div>
+        <div class="modal-text">You are an assistant that helps users filter and prioritize social media content (LinkedIn, Instagram, etc.). Each day, the user provides their current interests and exclusions, and you also know their general bio and persistent preferences.
+
+Your task is to determine whether each post is RELEVANT to the user today using semantic analysis of content, tone, tags, and visual context — regardless of platform.
+
+---
+Focus Profile (injected dynamically):
+- Daily interests
+- Weekly preferences
+- Selected platforms
+
+Today's inputs (injected dynamically):
+- Consider a post RELEVANT if it clearly aligns with the user's today's interests.
+- Exclude posts ONLY if explicitly mentioned.
+
+Important platform rule (conditional):
+- If Instagram is selected, ensure at least one Instagram post is included among the relevant posts if any are present and meet the criteria. If none are relevant, you may include the single best-aligned Instagram post, but prefer truly relevant posts.
+
+---
+### Relevance Matching Guidelines
+- Match semantically; don't rely only on exact keywords.
+- Assign a focusTag only if the post clearly aligns with one interest.
+- Apply semantic expansion, for example:
+  - Bouldering: climbing gyms, lead climbing, Moonboard, Janja Garnbret, IFSC competitions, indoor climbing events
+  - Style: fashion inspiration, outfits, wardrobe posts, beauty aesthetics
+  - Jobs: hiring, vacancies, job tips, career transitions, job offers
+  - Events: exhibitions, parties, launches, conferences, meetups
+- Choose the closest matching interest even if wording differs or includes relevant public figures.
+
+Scoring and selection:
+- Provide relevance_score 0–100 for each candidate you include.
+- Return NO MORE THAN 15% of input posts (round up). Prefer fewer if only a few are strong. If more seem relevant, choose the strongest diverse subset across tags/platforms.
+- If no strict matches exist, return up to 3 “best available” posts based on semantic similarity, alignment with bio/long-term interests, and engagement/recency (if available).
+
+Return fields per relevant post:
+- author
+- openaiSummary (max 15 words)
+- hasImage (boolean)
+- originalPostUrl
+- platform
+- focusTag
+- relevance_score (0–100)
+
+Respond with JSON: {"relevant_posts": [ ... ]}</div>
+        <button class="glass-btn close-modal" id="prompt-modal-close">Close</button>
+      </div>
+    </div>
+
+    <div id="co2-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-title">Saving CO₂</div>
+        <div class="modal-text">🔁 A simple 1‑hour example:
+Based on digital sustainability sources (incl. The Shift Project), streaming/social media typically emit ~0.1–1.5 g CO₂ per minute depending on device/network/media. Using a conservative mid‑point of ~0.6 g/min:
+
+1 hour of normal scrolling ≈ 60 min × 0.6 g ≈ ~36 g CO₂.
+
+📉 Why this app helps:
+Instead of doomscrolling for an hour and loading ~hundreds to over a thousand posts, this app rapidly loads a smaller set (~hundreds) in a short burst, filters them with AI, and shows only what matters. In practice, that means fewer total posts/data loaded compared to an hour of manual scrolling.
+
+🤖 About the AI:
+Filtering adds a small CO₂ cost per batch (typ. ~0.02–0.2 g per API call; we assume 0.2 g conservatively). Even with several batches, this is still minor compared to the emissions from an hour of continuous doomscrolling.
+
+Bottom line: Less mindless scrolling ⇒ fewer posts loaded ⇒ lower overall footprint, even after accounting for the AI filtering. ✨</div>
+        <button class="glass-btn close-modal" id="co2-modal-close">Close</button>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html> 
